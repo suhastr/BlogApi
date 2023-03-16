@@ -24,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-cg_w#pyqubt7)5^k8l$m$acgbd1e9#_d44(b7fwvi5g!)t_oyc"
+SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".pythonanywhere.com", "localhost", "127.0.0.1"] # new
 
 
 # Application definition
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "allauth.account", # new
     "allauth.socialaccount", # new
     "dj_rest_auth.registration", # new
+    "whitenoise", # new
 ]
 
 REST_FRAMEWORK = { # new
@@ -68,7 +69,8 @@ REST_FRAMEWORK = { # new
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    #"corsheaders.middleware.CorsMiddleware", # new
+    "whitenoise.middleware.WhiteNoiseMiddleware", # new
+    "corsheaders.middleware.CorsMiddleware", # new
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -114,10 +116,7 @@ SITE_ID = 1 # new
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+"default": env.dj_db_url("DATABASE_URL") # new
 }
 
 AUTH_USER_MODEL = "accounts.CustomUser" # new
@@ -157,6 +156,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+
+STATICFILES_DIRS = [BASE_DIR / "static"] # new
+STATIC_ROOT = BASE_DIR / "staticfiles" # new
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" # new
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
